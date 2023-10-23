@@ -7,6 +7,9 @@ import Confetti from "react-confetti"
 function App() {
   const [dice, setDice] = React.useState(allNewDice());
   const [tenzies, setTenzies] = React.useState(false);
+  const [gameStart, setGameStart] = React.useState(false);
+  const [elapsedTime, setElapsedTime] = React.useState(0);
+  const [startTime, setStartTime] = React.useState(null);
 
 
   React.useEffect(() => {
@@ -16,9 +19,23 @@ function App() {
 
     if (allHeld && sameNumber) {
       setTenzies(true);
+      setGameStart(false);
+      setStartTime(null);
       console.log("You won!");
     }
-  }, [dice])
+
+    if (gameStart) {
+        console.log("hi");
+        const intervalId = setInterval(() => {
+        const currentTime = new Date();
+        const elapsed = Math.floor((currentTime - startTime) / 1000); // in seconds
+        setElapsedTime(elapsed);
+      }, 10);
+      return () => clearInterval(intervalId);
+    }
+  }, [dice, gameStart])
+
+
   function generateNewDie() {
     return {
       value: Math.ceil(Math.random() * 6),
@@ -41,12 +58,18 @@ function App() {
         return die.id === id ? { ...die, isHeld: !die.isHeld } : die;
       })
     );
+
+    if (!gameStart) {
+      setGameStart(true);
+      setStartTime(new Date());
+    }
   }
 
   function roll() {
     if (tenzies) {
       setTenzies(false);
       setDice(allNewDice);
+      setElapsedTime(0);
     } else {
       setDice((prevDice) => {
         return prevDice.map((die) => {
@@ -75,6 +98,7 @@ function App() {
       <button className="button" onClick={roll}>
         {tenzies ? "New Game" : "Roll"}
       </button>
+      <p className="time">Time taken: {Math.floor(elapsedTime / 60)} minute(s) {elapsedTime % 60} second(s)</p>
     </div>
   );
 }

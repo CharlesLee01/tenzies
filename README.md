@@ -1,4 +1,4 @@
-# Tenzi
+# Tenzies
 
 ![image](images/Capture.PNG)
 
